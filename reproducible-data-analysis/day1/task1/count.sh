@@ -1,5 +1,38 @@
 #!/bin/bash
 
+# Count the words and characters in one non-empty input file.
+#
+# Usage:
+#   count.sh INPUT_FILE
+#   count.sh --help
+#
+# The counts are written to standard output in the form:
+#   File: INPUT_FILE; Word count: WORDS; Character count: CHARACTERS
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") INPUT_FILE
+       $(basename "$0") --help
+
+Count the number of words and characters in a non-empty text file.
+
+Arguments:
+  INPUT_FILE    Path to the input file.
+
+Options:
+  -h, --help    Show this help message and exit.
+
+Output:
+  Prints the input file name, word count, and character count to standard output.
+EOF
+}
+
+# Show documentation before installing the error trap used by the command.
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
 # Define the custom error messages
 no_input_file_msg="Please provide an input file"
 nonexistent_file_msg="The file does not exist"
@@ -44,7 +77,7 @@ if [ ! -s "${INPUT_FILE}" ]; then
     fi
 fi
 
-# Count the number of words and characters in the input file
+# Count words and characters using the standard Unix `wc` utility.
 words=$(wc -w "${INPUT_FILE}" | awk '{print $1}')
 characters=$(wc -c "${INPUT_FILE}" | awk '{print $1}')
 
@@ -53,5 +86,5 @@ if [ -z "${words}" ] || [ -z "${characters}" ]; then
     exit 143
 fi
 
-# Output the results to a file
+# Write the results to standard output.
 printf 'File: %s; Word count: %s; Character count: %s\n' "${INPUT_FILE}" "${words}" "${characters}"
