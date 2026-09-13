@@ -6,6 +6,7 @@ dependencies:
   - python=3.11
   - snakemake-minimal
   - pandas
+  - codecarbon
   - matplotlib
   - xsv=0.13
   - bowtie2
