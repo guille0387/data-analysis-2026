@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[postBuild] Verifying key tools for day1/day2..."
+
+bash --version | head -n 1
+python --version
+snakemake --version
+xsv --version || true
+bowtie2 --version | head -n 1
+samtools --version | head -n 1
+
+python - <<'PY'
+import pandas, matplotlib
+print("Python deps OK: pandas, matplotlib")
+PY
+
+echo "[postBuild] Done."
