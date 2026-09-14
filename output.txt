@@ -1,0 +1,5 @@
+File: /home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example1.txt; Word count: 31; Character count: 218
+File: /home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example2.txt; Word count: 36; Character count: 236
+File: /home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example3.txt; Word count: 30; Character count: 210
+File: /home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example4.txt; Word count: 28; Character count: 193
+File: /home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example5.txt; Word count: 30; Character count: 204

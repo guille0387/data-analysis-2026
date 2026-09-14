@@ -1,0 +1,5 @@
+/home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example1.txt
+/home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example2.txt
+/home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example3.txt
+/home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example4.txt
+/home/gfx654/Storage/Teaching/data-analysis-2025_bak/data-analysis-2025/reproducible-data-analysis/data/count/example5.txt

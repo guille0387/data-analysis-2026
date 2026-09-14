@@ -1,24 +1,19 @@
 #!/bin/bash
-set -euo pipefail # Enable strict mode
+set -euo pipefail
+
 trap 'echo "Error: ${BASH_SOURCE}:${LINENO}: ${BASH_COMMAND}" >&2' ERR
 trap 'echo "Interrupted" >&2 ; exit 1' INT
 
-# Map unpaired reads to a Bowtie2 index and sort the mapped alignments as BAM.
-#
-# Requirements:
-#   bowtie2 and samtools must be available on PATH.
-#   The Bowtie2 index is supplied by its basename (the value passed to -x).
-#
-# Intermediate files:
-#   <reads-basename>.mapped.bam   Mapped, unsorted BAM (removed after sorting).
-#   <reads-basename>.sorted.bam   Final coordinate-sorted BAM.
+# Map unpaired reads, sort the mapped alignments, and count reads per reference.
+# The count table is created from samtools idxstats output.
 
 usage() {
     cat <<EOF
 Usage: $(basename "$0") -i INDEX -r READS [-t THREADS]
        $(basename "$0") -h|--help
 
-Map unpaired reads to a Bowtie2 index and sort the mapped reads with Samtools.
+Map unpaired reads to a Bowtie2 index, sort the mapped reads, and create a
+simple count table showing mapped reads for each reference sequence.
 
 Required arguments:
   -i INDEX      Bowtie2 index basename.
@@ -29,8 +24,12 @@ Optional arguments:
   -h, --help    Show this help message and exit.
 
 Output:
-  Creates <reads-basename>.sorted.bam in the current directory.
-  The intermediate <reads-basename>.mapped.bam file is removed when complete.
+  <reads-basename>.sorted.bam
+  <reads-basename>.sorted.bam.bai
+  <reads-basename>.count-matrix.tsv
+
+The count table contains one row per reference sequence and its mapped-read
+count.
 EOF
 }
 
@@ -40,7 +39,7 @@ if [[ "${1:-}" == "--help" ]]; then
     exit 0
 fi
 
-# Parse command-line arguments
+# Parse command-line arguments.
 while getopts ":hi:r:t:" opt; do
     case ${opt} in
     h)
@@ -63,26 +62,36 @@ while getopts ":hi:r:t:" opt; do
     esac
 done
 
-# Check that required options were provided
+# Check that required options were provided.
 if [[ -z "${index:-}" || -z "${reads:-}" ]]; then
     usage
     exit 1
 fi
 
-# Use two threads unless the caller supplies a different value.
 threads="${threads:-2}"
 
 # Construct output file paths from the reads file basename.
-file_name=$(basename ${reads})
-bam_mapped_file="${file_name%%[ .]*}".mapped.bam
-bam_file="${file_name%%[ .]*}".sorted.bam
+file_name=$(basename "${reads}")
+sample_name="${file_name%%[ .]*}"
+bam_mapped_file="${sample_name}.mapped.bam"
+bam_file="${sample_name}.sorted.bam"
+count_file="${sample_name}.count-matrix.tsv"
 
-# Map unpaired reads and retain mapped alignments (SAM flag -F 4).
+# Map reads and keep only mapped alignments.
 bowtie2 --threads "${threads}" -x "${index}" -U "${reads}" \
     | samtools view -@ "${threads}" -bS -F 4 > "${bam_mapped_file}"
 
-# Sort the mapped alignments into the final BAM file.
+# Sort the mapped alignments and create an index for reference-level counting.
 samtools sort -@ "${threads}" -o "${bam_file}" "${bam_mapped_file}"
+samtools index "${bam_file}"
 
-# Remove the intermediate unsorted BAM after successful sorting.
-rm  -rf "${bam_mapped_file}"
+# Create a simple reference-by-count table from the sorted BAM.
+{
+    printf 'reference\tlength\tmapped_reads\n'
+    samtools idxstats "${bam_file}" | awk -F '\t' 'BEGIN { OFS="\t" } $1 != "*" { print $1, $2, $3 }'
+} > "${count_file}"
+
+# Remove the intermediate unsorted BAM after all downstream steps succeed.
+rm "${bam_mapped_file}"
+
+echo "Count matrix written to ${count_file}"

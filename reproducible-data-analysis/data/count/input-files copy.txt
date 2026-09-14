@@ -1,0 +1,5 @@
+reproducible-data-analysis/data/count/example1.txt
+reproducible-data-analysis/data/count/example2.txt
+reproducible-data-analysis/data/count/example3.txt
+reproducible-data-analysis/data/count/example4.txt
+reproducible-data-analysis/data/count/example5.txt
